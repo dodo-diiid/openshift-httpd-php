@@ -1,215 +1,215 @@
 #!/bin/sh
 
 install_libtool() {
-	local pkg=libtool-${LIBTOOL_VERSION}.tar.gz
-	
-	mkdir -p ${BUILD_DIR}
-	cd ${BUILD_DIR}
-	
-	echo "Downloading ${pkg}"
-	wget http://ftpmirror.gnu.org/libtool/${pkg}
-	
-	echo "Unpacking ${pkg}"
-	tar xf ${pkg}
-	cd libtool-${LIBTOOL_VERSION}
-	
-	echo "Configuring libtool"
-	./configure \
-		--prefix=${ROOT_DIR}/libs
-	
-	echo "Compiling libtool"
-	make -j 4
-	
-	echo "Installing libtool"
-	make install
-	
-	echo "Cleaning up build directory"
-	cd ..
-	cd ..
-	rm -rf ${BUILD_DIR}
+  local pkg=libtool-${LIBTOOL_VERSION}.tar.gz
+
+  mkdir -p ${BUILD_DIR}
+  cd ${BUILD_DIR}
+
+  echo "Downloading ${pkg}"
+  wget http://ftpmirror.gnu.org/libtool/${pkg}
+
+  echo "Unpacking ${pkg}"
+  tar xf ${pkg}
+  cd libtool-${LIBTOOL_VERSION}
+
+  echo "Configuring libtool"
+  ./configure \
+    --prefix=${ROOT_DIR}/libs
+
+  echo "Compiling libtool"
+  make -j 4
+
+  echo "Installing libtool"
+  make install
+
+  echo "Cleaning up build directory"
+  cd ..
+  cd ..
+  rm -rf ${BUILD_DIR}
 }
 
 check_libtool() {
-	local libtool_bin=${ROOT_DIR}/libs/bin/libtool
-	
-	if [ ! -e "${libtool_bin}" ]; then
-		echo "libtool is not installed"
-		install_libtool
-	else
-		local libtool_version=`${libtool_bin} --version | head -n 1 | grep -o [0-9.]*$`
-		
-		if [ "${LIBTOOL_VERSION}" != "${libtool_version}" ]; then
-			echo "Installed libtool is old, version: ${libtool_version}"
-			install_libtool
-		else
-			echo "libtool is up to date, version: ${libtool_version}"
-		fi
-	fi
+  local libtool_bin=${ROOT_DIR}/libs/bin/libtool
+
+  if [ ! -e "${libtool_bin}" ]; then
+    echo "libtool is not installed"
+    install_libtool
+  else
+    local libtool_version=`${libtool_bin} --version | head -n 1 | grep -o [0-9.]*$`
+
+    if [ "${LIBTOOL_VERSION}" != "${libtool_version}" ]; then
+      echo "Installed libtool is old, version: ${libtool_version}"
+      install_libtool
+    else
+      echo "libtool is up to date, version: ${libtool_version}"
+    fi
+  fi
 }
 
 install_libmcrypt() {
-	local pkg=libmcrypt-${LIBMCRYPT_VERSION}.tar.bz2
-	local ts=`date +%s`
-	
-	mkdir -p ${BUILD_DIR}
-	cd ${BUILD_DIR}
-	
-	echo "Downloading ${pkg}"
-	wget -O ./${pkg} "http://downloads.sourceforge.net/project/mcrypt/Libmcrypt/${LIBMCRYPT_VERSION}/${pkg}?r=&ts=${ts}"
-	
-	echo "Unpacking ${pkg}"
-	tar xf ${pkg}
-	cd libmcrypt-${LIBMCRYPT_VERSION}
-	
-	echo "Configuring libmcrypt"
-	./configure \
-		--prefix=${ROOT_DIR}/libmcrypt \
-		--disable-posix-threads
-	
-	echo "Compiling libmcrypt"
-	make -j 4
-	
-	echo "Installing libmcrypt"
-	make install
-	
-	echo "Cleaning up build directory"
-	cd ..
-	cd ..
-	rm -rf ${BUILD_DIR}
+  local pkg=libmcrypt-${LIBMCRYPT_VERSION}.tar.bz2
+  local ts=`date +%s`
+
+  mkdir -p ${BUILD_DIR}
+  cd ${BUILD_DIR}
+
+  echo "Downloading ${pkg}"
+  wget -O ./${pkg} "http://downloads.sourceforge.net/project/mcrypt/Libmcrypt/${LIBMCRYPT_VERSION}/${pkg}?r=&ts=${ts}"
+
+  echo "Unpacking ${pkg}"
+  tar xf ${pkg}
+  cd libmcrypt-${LIBMCRYPT_VERSION}
+
+  echo "Configuring libmcrypt"
+  ./configure \
+    --prefix=${ROOT_DIR}/libmcrypt \
+    --disable-posix-threads
+
+  echo "Compiling libmcrypt"
+  make -j 4
+
+  echo "Installing libmcrypt"
+  make install
+
+  echo "Cleaning up build directory"
+  cd ..
+  cd ..
+  rm -rf ${BUILD_DIR}
 }
 
 check_libmcrypt() {
-	local libmcrypt_bin=${ROOT_DIR}/libmcrypt/bin/libmcrypt-config
-	
-	if [ ! -e "${libmcrypt_bin}" ]; then
-		echo "libmcrypt is not installed"
-		install_libmcrypt
-	else
-		local libmcrypt_version=`${libmcrypt_bin} --version`
-		
-		if [ "${LIBMCRYPT_VERSION}" != "${libmcrypt_version}" ]; then
-			echo "Installed libmcrypt is old, version: ${libmcrypt_version}"
-			install_libmcrypt
-		else
-			echo "libmcrypt is up to date, version: ${libmcrypt_version}"
-		fi
-	fi
+  local libmcrypt_bin=${ROOT_DIR}/libmcrypt/bin/libmcrypt-config
+
+  if [ ! -e "${libmcrypt_bin}" ]; then
+    echo "libmcrypt is not installed"
+    install_libmcrypt
+  else
+    local libmcrypt_version=`${libmcrypt_bin} --version`
+
+    if [ "${LIBMCRYPT_VERSION}" != "${libmcrypt_version}" ]; then
+      echo "Installed libmcrypt is old, version: ${libmcrypt_version}"
+      install_libmcrypt
+    else
+      echo "libmcrypt is up to date, version: ${libmcrypt_version}"
+    fi
+  fi
 }
 
 install_php() {
-	local pkg=php-${PHP_VERSION}.tar.gz
-	
-	mkdir -p ${BUILD_DIR}
-	cd ${BUILD_DIR}
-	
-	if [ ! -d "php-${PHP_VERSION}" ]; then
-		echo "Downloading ${pkg}"
-		wget -O ./${pkg} http://www.php.net/get/${pkg}/from/us1.php.net/mirror
-		
-		echo "Unpacking ${pkg}"
-		tar xf ${pkg}
-	fi
-	cd php-${PHP_VERSION}
-	
-	if [ ! -f config.log ] || [ "`tail -n 1 config.log`" != "configure: exit 0" ]; then
-		echo "Configuring PHP"
-		./configure \
-			`#--build=x86_64-unknown-linux-gnu --host=x86_64-unknown-linux-gnu --target=x86_64-unknown-linux-gnu` \
-			--prefix=${ROOT_DIR}/php \
-			--disable-rpath \
-			--disable-cli \
-			--disable-cgi \
-			--enable-fpm \
-			--with-layout=GNU \
-			`#--with-apxs2` \
-			--enable-bcmath=shared \
-			--enable-calendar=shared \
-			--enable-dba=shared \
-			--enable-exif=shared \
-			--enable-ftp=shared \
-			--enable-gd-native-ttf \
-			--enable-intl=shared \
-			--enable-mbstring \
-			--enable-opcache \
-			--enable-phar=shared \
-			--enable-posix=shared \
-			--enable-shmop=shared \
-			--enable-soap=shared \
-			--enable-sockets=shared \
-			--enable-zip=shared \
-			--with-bz2=shared \
-			--with-curl=shared \
-			`#--with-db4` \
-			`#--with-enchant=shared` \
-			--with-freetype-dir \
-			--with-xpm-dir \
-			--with-gd=shared \
-			--with-gdbm \
-			--with-gettext=shared \
-			--with-gmp=shared \
-			--with-iconv=shared \
-			`#--with-icu-dir` \
-			`#--with-imap=shared` \
-			`#--with-imap-ssl` \
-			--with-jpeg-dir \
-			`#--with-vpx-dir` \
-			`#--with-ldap=shared` \
-			`#--with-ldap-sasl` \
-			`#--with-libzip` \
-			--with-mcrypt=shared,${ROOT_DIR}/libmcrypt \
-			--with-mhash \
-			`#--with-mssql=shared` \
-			--with-mysql=shared,mysqlnd \
-			--with-mysqli=shared,mysqlnd \
-			--with-openssl=shared \
-			--with-pcre-regex \
-			--with-pdo-mysql=shared,mysqlnd \
-			`#--with-pdo-odbc=shared,unixODBC` \
-			--with-pdo-pgsql=shared \
-			--with-pdo-sqlite=shared \
-			--with-pgsql=shared \
-			--with-png-dir \
-			`#--with-pspell=shared` \
-			`#--with-snmp=shared` \
-			--with-sqlite3=shared \
-			`#--with-tidy=shared` \
-			`#--with-unixODBC=shared` \
-			--with-xmlrpc=shared \
-			--with-xsl=shared \
-			--with-zlib
-	fi
-	
-	echo "Compiling PHP"
-	make
-	
-	echo "Installing PHP"
-	make install
-	
-	echo "Cleaning up build directory"
-	cd ..
-	cd ..
-	rm -rf ${BUILD_DIR}
+  local pkg=php-${PHP_VERSION}.tar.gz
+
+  mkdir -p ${BUILD_DIR}
+  cd ${BUILD_DIR}
+
+  if [ ! -d "php-${PHP_VERSION}" ]; then
+    echo "Downloading ${pkg}"
+    wget -O ./${pkg} http://bg2.php.net/get/${pkg}/from/this/mirror
+
+    echo "Unpacking ${pkg}"
+    tar xf ${pkg}
+  fi
+  cd php-${PHP_VERSION}
+
+  if [ ! -f config.log ] || [ "`tail -n 1 config.log`" != "configure: exit 0" ]; then
+    echo "Configuring PHP"
+    ./configure \
+      `#--build=x86_64-unknown-linux-gnu --host=x86_64-unknown-linux-gnu --target=x86_64-unknown-linux-gnu` \
+      --prefix=${ROOT_DIR}/php \
+      --disable-rpath \
+      --disable-cli \
+      --disable-cgi \
+      --enable-fpm \
+      --with-layout=GNU \
+      `#--with-apxs2` \
+      --enable-bcmath=shared \
+      --enable-calendar=shared \
+      --enable-dba=shared \
+      --enable-exif=shared \
+      --enable-ftp=shared \
+      --enable-gd-native-ttf \
+      --enable-intl=shared \
+      --enable-mbstring \
+      --enable-opcache \
+      --enable-phar=shared \
+      --enable-posix=shared \
+      --enable-shmop=shared \
+      --enable-soap=shared \
+      --enable-sockets=shared \
+      --enable-zip=shared \
+      --with-bz2=shared \
+      --with-curl=shared \
+      `#--with-db4` \
+      `#--with-enchant=shared` \
+      --with-freetype-dir \
+      --with-xpm-dir \
+      --with-gd=shared \
+      --with-gdbm \
+      --with-gettext=shared \
+      --with-gmp=shared \
+      --with-iconv=shared \
+      `#--with-icu-dir` \
+      `#--with-imap=shared` \
+      `#--with-imap-ssl` \
+      --with-jpeg-dir \
+      `#--with-vpx-dir` \
+      `#--with-ldap=shared` \
+      `#--with-ldap-sasl` \
+      `#--with-libzip` \
+      --with-mcrypt=shared,${ROOT_DIR}/libmcrypt \
+      --with-mhash \
+      `#--with-mssql=shared` \
+      `#--with-mysql=shared,mysqlnd` \
+      `#--with-mysqli=shared,mysqlnd` \
+      --with-openssl=shared \
+      --with-pcre-regex \
+      `#--with-pdo-mysql=shared,mysqlnd` \
+      `#--with-pdo-odbc=shared,unixODBC` \
+      --with-pdo-pgsql=shared \
+      `#--with-pdo-sqlite=shared` \
+      --with-pgsql=shared \
+      `#--with-png-dir` \
+      `#--with-pspell=shared` \
+      `#--with-snmp=shared` \
+      `#--with-sqlite3=shared` \
+      `#--with-tidy=shared` \
+      `#--with-unixODBC=shared` \
+      --with-xmlrpc=shared \
+      --with-xsl=shared \
+      --with-zlib
+  fi
+
+  echo "Compiling PHP"
+  make
+
+  echo "Installing PHP"
+  make install
+
+  echo "Cleaning up build directory"
+  cd ..
+  cd ..
+  rm -rf ${BUILD_DIR}
 }
 
 check_php() {
-	check_libmcrypt
-	
-	local php_bin=${ROOT_DIR}/php/sbin/php-fpm
-	
-	if [ ! -e "${php_bin}" ]; then
-		echo "PHP is not installed"
-		install_php
-	else
-		local php_version=`${php_bin} --version 2> /dev/null | grep -m 1 -o PHP\ [0-9.]* | cut -d ' ' -f 2`
-		
-		if [ "${PHP_VERSION}" != "${php_version}" ]; then
-			echo "Installed PHP is old, version: ${php_version}"
-			install_php
-		else
-			echo "PHP is up to date, version: ${php_version}"
-		fi
-	fi
-	
-	cp ${ROOT_DIR}/php/etc/php-fpm.conf ${ROOT_DIR}/php/etc/php-fpm.conf.old 2> /dev/null || true
-	cp ${OPENSHIFT_REPO_DIR}/conf/php-fpm.conf ${ROOT_DIR}/php/etc/php-fpm.conf
+  check_libmcrypt
+
+  local php_bin=${ROOT_DIR}/php/sbin/php-fpm
+
+  if [ ! -e "${php_bin}" ]; then
+    echo "PHP is not installed"
+    install_php
+  else
+    local php_version=`${php_bin} --version 2> /dev/null | grep -m 1 -o PHP\ [0-9.]* | cut -d ' ' -f 2`
+
+    if [ "${PHP_VERSION}" != "${php_version}" ]; then
+      echo "Installed PHP is old, version: ${php_version}"
+      install_php
+    else
+      echo "PHP is up to date, version: ${php_version}"
+    fi
+  fi
+
+  cp ${ROOT_DIR}/php/etc/php-fpm.conf ${ROOT_DIR}/php/etc/php-fpm.conf.old 2> /dev/null || true
+  cp ${OPENSHIFT_REPO_DIR}/conf/php-fpm.conf ${ROOT_DIR}/php/etc/php-fpm.conf
 }

@@ -5,13 +5,7 @@ set -e
 . ${OPENSHIFT_REPO_DIR}/.openshift/action_hooks/config
 . ${AH_DIR}/build_httpd
 . ${AH_DIR}/build_php
-. ${AH_DIR}/build_yaf_ext
-. ${AH_DIR}/build_phalcon_ext
-. ${AH_DIR}/build_mongo_driver
+
 
 check_httpd
 check_php
-
-check_yaf_ext # php extension
-#check_phalcon_ext # php extension
-check_mongo_driver # php db driver
